@@ -370,7 +370,7 @@ class BouncerSimpleTest extends BaseTestCase
      * @test
      * @dataProvider bouncerProvider
      */
-    function gate_before_methods_intercept_bouncer_permissions($provider)
+    function gate_before_callback_intercepts_bouncer_permissions($provider)
     {
         list($bouncer, $user) = $provider();
 
@@ -396,7 +396,7 @@ class BouncerSimpleTest extends BaseTestCase
      * @test
      * @dataProvider bouncerProvider
      */
-    function policy_before_methods_intercept_bouncer_permissions($provider)
+    function policy_before_method_intercepts_bouncer_permissions($provider)
     {
         list($bouncer, $user) = $provider();
 
@@ -417,7 +417,7 @@ class BouncerSimpleTest extends BaseTestCase
      * @test
      * @dataProvider bouncerProvider
      */
-    function policy_methods_intercept_bouncer_permissions($provider)
+    function policy_method_intercepts_bouncer_permissions($provider)
     {
         list($bouncer, $user) = $provider();
 
@@ -432,6 +432,33 @@ class BouncerSimpleTest extends BaseTestCase
 
         $this->assertTrue($bouncer->can('null', User::class));
         $this->assertTrue($bouncer->cannot('deniedWithoutIntercept', User::class));
+    }
+
+    /**
+     * @test
+     * @dataProvider bouncerProvider
+     */
+    function regular_ability_callback_intercepts_bouncer_permissions($provider)
+    {
+        list($bouncer, $user) = $provider();
+
+        $bouncer->gate()->define('denied', function () {
+            return false;
+        });
+
+        $bouncer->gate()->define('allowed', function () {
+            return true;
+        });
+
+        $this->assertTrue($bouncer->cannot('null'));
+        $this->assertTrue($bouncer->cannot('denied'));
+        $this->assertTrue($bouncer->can('allowed'));
+
+        $bouncer->allow($user)->to('null');
+        $bouncer->allow($user)->to('denied');
+
+        $this->assertTrue($bouncer->cannot('denied'));
+        $this->assertTrue($bouncer->can('null'));
     }
 
     /**
