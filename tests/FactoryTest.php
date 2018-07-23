@@ -1,7 +1,7 @@
 <?php
 
+use Silber\Bouncer\Gate;
 use Silber\Bouncer\Bouncer;
-use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
 
 class FactoryTest extends BaseTestCase

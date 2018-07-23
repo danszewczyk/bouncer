@@ -185,7 +185,8 @@ class ForbidTest extends BaseTestCase
     }
 
     /**
-     * @test
+     * Disabled for now. Functionality still in flux.
+     *
      * @dataProvider bouncerProvider
      */
     function forbidding_an_ability_stops_all_further_checks($provider)

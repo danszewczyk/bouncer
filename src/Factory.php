@@ -2,11 +2,10 @@
 
 namespace Silber\Bouncer;
 
-use Illuminate\Auth\Access\Gate;
+use Silber\Bouncer\Gate;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class Factory
 {
@@ -27,7 +26,7 @@ class Factory
     /**
      * The gate instance to use.
      *
-     * @var \Illuminate\Contracts\Auth\Access\Gate
+     * @var \Silber\Bouncer\Gate
      */
     protected $gate;
 
@@ -91,10 +90,10 @@ class Factory
     /**
      * Set the gate instance to use.
      *
-     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
+     * @param  \Silber\Bouncer\Gate  $gate
      * @return $this
      */
-    public function withGate(GateContract $gate)
+    public function withGate(Gate $gate)
     {
         $this->gate = $gate;
 
@@ -137,7 +136,7 @@ class Factory
     /**
      * Get an instance of the gate.
      *
-     * @return \Illuminate\Contracts\Auth\Access\Gate
+     * @return \Silber\Bouncer\Gate
      */
     protected function getGate()
     {

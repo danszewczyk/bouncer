@@ -99,14 +99,7 @@ abstract class BaseClipboard implements Contracts\Clipboard
         $this->currentChecks[] = [$authority, $ability, $model];
 
         try {
-            // Since the gate's "raw" method is not public,
-            // we need to specifically bind a closure to
-            // the gate, so we can invoke it properly.
-            $checkGate = (function () use ($ability, $model) {
-                return $this->raw($ability, $model);
-            })->bindTo($gate->forUser($authority), get_class($gate));
-
-            return $checkGate();
+            return $gate->getRaw($ability, $model);
         } finally {
             array_pop($this->currentChecks);
         }

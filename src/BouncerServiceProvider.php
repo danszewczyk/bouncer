@@ -2,6 +2,7 @@
 
 namespace Silber\Bouncer;
 
+use Silber\Bouncer\Gate;
 use Silber\Bouncer\Database\Role;
 use Silber\Bouncer\Database\Models;
 use Silber\Bouncer\Database\Ability;
@@ -9,8 +10,8 @@ use Silber\Bouncer\Console\CleanCommand;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class BouncerServiceProvider extends ServiceProvider
 {
@@ -21,6 +22,7 @@ class BouncerServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerGate();
         $this->registerClipboard();
         $this->registerCommands();
         $this->registerBouncer();
@@ -78,6 +80,20 @@ class BouncerServiceProvider extends ServiceProvider
     protected function registerCommands()
     {
         $this->commands(CleanCommand::class);
+    }
+
+    /**
+     * Register the gate as a singleton.
+     *
+     * @return void
+     */
+    protected function registerGate()
+    {
+        $this->app->singleton(GateContract::class, function () {
+            return new Gate($app, function () use ($app) {
+                return call_user_func($app['auth']->userResolver());
+            });
+        });
     }
 
     /**

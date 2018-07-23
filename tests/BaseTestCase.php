@@ -2,6 +2,7 @@
 
 require __DIR__.'/../migrations/create_bouncer_tables.php';
 
+use Silber\Bouncer\Gate;
 use Silber\Bouncer\Bouncer;
 use Silber\Bouncer\Clipboard;
 use Silber\Bouncer\Database\Models;
@@ -9,7 +10,6 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
 use Silber\Bouncer\Contracts\Clipboard as ClipboardContract;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\Access\Gate;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
@@ -126,7 +126,7 @@ abstract class BaseTestCase extends TestCase
      * Get an access gate instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $user
-     * @return \Illuminate\Auth\Access\Gate
+     * @return \Silber\Bouncer\Gate
      */
     protected function gate(Eloquent $authority)
     {
