@@ -367,6 +367,74 @@ class BouncerSimpleTest extends BaseTestCase
     }
 
     /**
+     * @test
+     * @dataProvider bouncerProvider
+     */
+    function gate_before_methods_intercept_bouncer_permissions($provider)
+    {
+        list($bouncer, $user) = $provider();
+
+        $bouncer->gate()->before(function ($user, $ability) {
+            switch ($ability) {
+                case 'allowed': return true;
+                case 'denied': return false;
+            }
+        });
+
+        $this->assertTrue($bouncer->cannot('null'));
+        $this->assertTrue($bouncer->cannot('denied'));
+        $this->assertTrue($bouncer->can('allowed'));
+
+        $bouncer->allow($user)->to('null');
+        $bouncer->allow($user)->to('denied');
+
+        $this->assertTrue($bouncer->cannot('denied'));
+        $this->assertTrue($bouncer->can('null'));
+    }
+
+    /**
+     * @test
+     * @dataProvider bouncerProvider
+     */
+    function policy_before_methods_intercept_bouncer_permissions($provider)
+    {
+        list($bouncer, $user) = $provider();
+
+        $bouncer->gate()->policy(User::class, BouncerTestPolicy::class);
+
+        $this->assertTrue($bouncer->cannot('null', User::class));
+        $this->assertTrue($bouncer->cannot('denied', User::class));
+        $this->assertTrue($bouncer->can('allowed', User::class));
+
+        $bouncer->allow($user)->to('null', User::class);
+        $bouncer->allow($user)->to('denied', User::class);
+
+        $this->assertTrue($bouncer->cannot('denied', User::class));
+        $this->assertTrue($bouncer->can('null', User::class));
+    }
+
+    /**
+     * @test
+     * @dataProvider bouncerProvider
+     */
+    function policy_methods_intercept_bouncer_permissions($provider)
+    {
+        list($bouncer, $user) = $provider();
+
+        $bouncer->gate()->policy(User::class, BouncerTestPolicy::class);
+
+        $this->assertTrue($bouncer->cannot('null', User::class));
+        $this->assertTrue($bouncer->cannot('deniedWithoutIntercept', User::class));
+        $this->assertTrue($bouncer->can('allowedWithoutIntercept', User::class));
+
+        $bouncer->allow($user)->to('null', User::class);
+        $bouncer->allow($user)->to('deniedWithoutIntercept', User::class);
+
+        $this->assertTrue($bouncer->can('null', User::class));
+        $this->assertTrue($bouncer->cannot('deniedWithoutIntercept', User::class));
+    }
+
+    /**
      * Create a new role with the given name.
      *
      * @param  string  $name
@@ -375,5 +443,45 @@ class BouncerSimpleTest extends BaseTestCase
     protected function role($name)
     {
         return Role::create(compact('name'));
+    }
+}
+
+
+class BouncerTestPolicy
+{
+    public function before($authority, $ability)
+    {
+        switch ($ability) {
+            case 'allowed': return true;
+            case 'denied': return false;
+            case 'allowedWithoutIntercept': return null;
+            case 'deniedWithoutIntercept': return null;
+            case 'null': return null;
+        }
+    }
+
+    public function allowed()
+    {
+        // Without this method, "before" wouldn't be called.
+    }
+
+    public function denied()
+    {
+        // Without this method, "before" wouldn't be called.
+    }
+
+    public function null()
+    {
+        return;
+    }
+
+    public function allowedWithoutIntercept()
+    {
+        return true;
+    }
+
+    public function deniedWithoutIntercept()
+    {
+        return false;
     }
 }

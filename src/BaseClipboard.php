@@ -15,6 +15,17 @@ abstract class BaseClipboard implements Contracts\Clipboard
     use HandlesAuthorization;
 
     /**
+     * Holds the arguments of the current checks.
+     *
+     * We use a multi-dimensional array, so that users
+     * are given the opportunity to do other checks
+     * at the gate from their policy methods.
+     *
+     * @var array[]
+     */
+    protected $currentChecks = [];
+
+    /**
      * Register the clipboard at the given gate.
      *
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
@@ -22,11 +33,26 @@ abstract class BaseClipboard implements Contracts\Clipboard
      */
     public function registerAt(Gate $gate)
     {
-        $gate->before(function ($authority, $ability, $arguments = [], $additional = null) {
+        $gate->before(function (
+            $authority, $ability, $arguments = [], $additional = null
+        ) use ($gate) {
             list($model, $additional) = $this->parseGateArguments($arguments, $additional);
 
             if (! is_null($additional)) {
                 return;
+            }
+
+            // Before we run our own checks, we let the gate run its own checks
+            // (including policies). Since we run as a "before" callback, we
+            // need to make sure we don't run again in this second phase.
+            if ($this->isCurrentCheck($authority, $ability, $model)) {
+                return;
+            }
+
+            $result = $this->checkAtGate($gate, $authority, $ability, $model);
+
+            if (!is_null($result)) {
+                return $result;
             }
 
             if ($id = $this->checkGetId($authority, $ability, $model)) {
@@ -38,6 +64,52 @@ abstract class BaseClipboard implements Contracts\Clipboard
             // doesn't run any further checks. Otherwise we return null.
             return $id;
         });
+    }
+
+    /**
+     * Determines whether we're in the middle of checking the given arguments.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $authority
+     * @param  string  $ability
+     * @param  \Illuminate\Database\Eloquent\Model|string|null  $model
+     * @return bool|null
+     */
+    protected function isCurrentCheck(Model $authority, $ability, $model = null)
+    {
+        if (count($this->currentChecks) == 0) {
+            return false;
+        }
+
+        return end($this->currentChecks) == [$authority, $ability, $model];
+    }
+
+    /**
+     * Get the raw result from the gate for the given check.
+     *
+     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
+     * @param  \Illuminate\Database\Eloquent\Model  $authority
+     * @param  string  $ability
+     * @param  \Illuminate\Database\Eloquent\Model|string|null  $model
+     * @return bool|null
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function checkAtGate(Gate $gate, $authority, $ability, $model = null)
+    {
+        $this->currentChecks[] = [$authority, $ability, $model];
+
+        try {
+            // Since the gate's "raw" method is not public,
+            // we need to specifically bind a closure to
+            // the gate, so we can invoke it properly.
+            $checkGate = (function () use ($ability, $model) {
+                return $this->raw($ability, $model);
+            })->bindTo($gate->forUser($authority), get_class($gate));
+
+            return $checkGate();
+        } finally {
+            array_pop($this->currentChecks);
+        }
     }
 
     /**
