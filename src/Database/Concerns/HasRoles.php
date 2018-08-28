@@ -23,7 +23,9 @@ trait HasRoles
         $relation = $this->morphToMany(
             Models::classname(Role::class),
             'entity',
-            Models::table('assigned_roles')
+            Models::table('assigned_roles'),
+            'entity_uuid',
+            'role_uuid'
         );
 
         return Models::scope()->applyToRelation($relation);

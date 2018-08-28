@@ -24,7 +24,9 @@ trait HasAbilities
         $relation = $this->morphToMany(
             Models::classname(Ability::class),
             'entity',
-            Models::table('permissions')
+            Models::table('permissions'),
+            'entity_uuid',
+            'ability_uuid'
         );
 
         return Models::scope()->applyToRelation($relation);

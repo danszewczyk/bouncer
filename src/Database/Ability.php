@@ -3,10 +3,12 @@
 namespace Silber\Bouncer\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\BinaryUuid\HasBinaryUuid;
 
 class Ability extends Model
 {
     use Concerns\IsAbility;
+    use HasBinaryUuid;
 
     /**
      * The attributes that are mass assignable.

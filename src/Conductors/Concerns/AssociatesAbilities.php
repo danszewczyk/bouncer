@@ -35,10 +35,10 @@ trait AssociatesAbilities
     {
         $relation = $authority->abilities();
 
-        $relation->whereIn('id', $abilityIds)->wherePivot('forbidden', '=', $forbidden);
+        $relation->whereIn('uuid', $abilityIds)->wherePivot('forbidden', '=', $forbidden);
 
         Models::scope()->applyToRelation($relation);
 
-        return $relation->get(['id'])->pluck('id')->all();
+        return $relation->get(['uuid'])->pluck('uuid')->all();
     }
 }

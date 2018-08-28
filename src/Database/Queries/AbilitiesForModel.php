@@ -89,11 +89,11 @@ class AbilitiesForModel
             // that cover all instances of this model. If it does exist, we only
             // want to find blanket abilities if we're not using strict mode.
             if ( ! $model->exists || ! $strict) {
-                $query->whereNull($this->table.'.entity_id');
+                $query->whereNull($this->table.'.entity_uuid');
             }
 
             if ($model->exists) {
-                $query->orWhere($this->table.'.entity_id', $model->getKey());
+                $query->orWhere($this->table.'.entity_uuid', $model->getKey());
             }
         };
     }

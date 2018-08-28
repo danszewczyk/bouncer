@@ -70,7 +70,7 @@ trait IsAbility
 
         return (new static)->forceFill($attributes + [
             'entity_type' => $model->getMorphClass(),
-            'entity_id'   => $model->exists ? $model->getKey() : null,
+            'entity_uuid'   => $model->exists ? $model->getKey() : null,
         ]);
     }
 
@@ -119,8 +119,8 @@ trait IsAbility
             $slug .= '-'.$this->attributes['entity_type'];
         }
 
-        if ($this->attributes['entity_id']) {
-            $slug .= '-'.$this->attributes['entity_id'];
+        if ($this->attributes['entity_uuid']) {
+            $slug .= '-'.$this->attributes['entity_uuid'];
         }
 
         if ($this->attributes['only_owned']) {

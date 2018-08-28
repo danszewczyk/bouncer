@@ -192,9 +192,9 @@ trait IsRole
 
         $query = $this->newBaseQueryBuilder()
             ->from($table = Models::table('assigned_roles'))
-            ->where('role_id', $this->getKey())
+            ->where('role_uuid', $this->getKey())
             ->where('entity_type', $model->getMorphClass())
-            ->whereIn('entity_id', $keys);
+            ->whereIn('entity_uuid', $keys);
 
         Models::scope()->applyToRelationQuery($query, $table);
 
@@ -216,9 +216,9 @@ trait IsRole
 
         return array_map(function ($key) use ($type) {
             return Models::scope()->getAttachAttributes() + [
-                'role_id'     => $this->getKey(),
+                'role_uuid'     => $this->getKey(),
                 'entity_type' => $type,
-                'entity_id'   => $key,
+                'entity_uud'   => $key,
             ];
         }, $keys);
     }
