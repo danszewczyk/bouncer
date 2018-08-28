@@ -30,31 +30,6 @@ trait IsAbility
     }
 
     /**
-     * Get the options attribute.
-     *
-     * @return array
-     */
-    public function getOptionsAttribute()
-    {
-        if (empty($this->attributes['options'])) {
-            return [];
-        }
-
-        return json_decode($this->attributes['options']);
-    }
-
-    /**
-     * Set the "options" attribute.
-     *
-     * @param  array  $options
-     * @return void
-     */
-    public function setOptionsAttribute(array $options)
-    {
-        $this->attributes['options'] = json_encode($options);
-    }
-
-    /**
      * Create a new ability for a specific model.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
@@ -95,7 +70,7 @@ trait IsAbility
 
         return (new static)->forceFill($attributes + [
             'entity_type' => $model->getMorphClass(),
-            'entity_id'   => $model->exists ? $model->getKey() : null,
+            'entity_uuid'   => $model->exists ? $model->getKey() : null,
         ]);
     }
 
@@ -144,8 +119,8 @@ trait IsAbility
             $slug .= '-'.$this->attributes['entity_type'];
         }
 
-        if ($this->attributes['entity_id']) {
-            $slug .= '-'.$this->attributes['entity_id'];
+        if ($this->attributes['entity_uuid']) {
+            $slug .= '-'.$this->attributes['entity_uuid'];
         }
 
         if ($this->attributes['only_owned']) {
@@ -177,7 +152,7 @@ trait IsAbility
     {
         $names = (array) $name;
 
-        if (! $strict && $name !== '*') {
+        if ( ! $strict) {
             $names[] = '*';
         }
 

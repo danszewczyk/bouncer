@@ -150,49 +150,22 @@ class Bouncer
     }
 
     /**
-     * Get the clipboard instance.
-     *
-     * @return \Silber\Bouncer\Contracts\Clipboard
-     */
-    public function getClipboard()
-    {
-        return $this->clipboard;
-    }
-
-    /**
-     * Set the clipboard instance used by bouncer.
-     *
-     * Will also register the given clipboard with the container.
-     *
-     * @param  \Silber\Bouncer\Contracts\Clipboard
-     * @return $this
-     */
-    public function setClipboard(Contracts\Clipboard $clipboard)
-    {
-        Container::getInstance()->instance(Contracts\Clipboard::class, $clipboard);
-
-        $this->clipboard = $clipboard;
-
-        return $this;
-    }
-
-    /**
-     * Use a cached clipboard with the given cache instance.
+     * Use the given cache instance.
      *
      * @param  \Illuminate\Contracts\Cache\Store  $cache
      * @return $this
      */
     public function cache(Store $cache = null)
     {
-        $cache = $cache ?: $this->resolve(CacheRepository::class)->getStore();
-
-        if ($this->usesCachedClipboard()) {
-            $this->clipboard->setCache($cache);
-
-            return $this;
+        if (! $this->usesCachedClipboard()) {
+            throw new RuntimeException('To use caching, you must use an instance of CachedClipboard.');
         }
 
-        return $this->setClipboard(new CachedClipboard($cache));
+        $cache = $cache ?: $this->resolve(CacheRepository::class)->getStore();
+
+        $this->clipboard->setCache($cache);
+
+        return $this;
     }
 
     /**
@@ -202,7 +175,11 @@ class Bouncer
      */
     public function dontCache()
     {
-        return $this->setClipboard(new Clipboard);
+        if ($this->usesCachedClipboard()) {
+            $this->clipboard->setCache(new NullStore);
+        }
+
+        return $this;
     }
 
     /**

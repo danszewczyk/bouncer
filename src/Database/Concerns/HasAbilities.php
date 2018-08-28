@@ -4,9 +4,9 @@ namespace Silber\Bouncer\Database\Concerns;
 
 use Illuminate\Container\Container;
 
+use Silber\Bouncer\Clipboard;
 use Silber\Bouncer\Database\Models;
 use Silber\Bouncer\Database\Ability;
-use Silber\Bouncer\Contracts\Clipboard;
 use Silber\Bouncer\Conductors\GivesAbilities;
 use Silber\Bouncer\Conductors\ForbidsAbilities;
 use Silber\Bouncer\Conductors\RemovesAbilities;
@@ -14,18 +14,6 @@ use Silber\Bouncer\Conductors\UnforbidsAbilities;
 
 trait HasAbilities
 {
-    /**
-     * Boot the HasAbilities trait.
-     *
-     * @return void
-     */
-    public static function bootHasAbilities()
-    {
-        static::deleted(function ($model) {
-            $model->abilities()->detach();
-        });
-    }
-
     /**
      * The abilities relationship.
      *
@@ -36,7 +24,9 @@ trait HasAbilities
         $relation = $this->morphToMany(
             Models::classname(Ability::class),
             'entity',
-            Models::table('permissions')
+            Models::table('permissions'),
+            'entity_uuid',
+            'ability_uuid'
         );
 
         return Models::scope()->applyToRelation($relation);
@@ -137,7 +127,7 @@ trait HasAbilities
     /**
      * Get an instance of the bouncer's clipboard.
      *
-     * @return \Silber\Bouncer\Contracts\Clipboard
+     * @return \Silber\Bouncer\Clipboard
      */
     protected function getClipboardInstance()
     {

@@ -194,7 +194,7 @@ class Models
         } elseif (isset(static::$ownership['*'])) {
             $attribute = static::$ownership['*'];
         } else {
-            $attribute = strtolower(static::basename($authority)).'_id';
+            $attribute = strtolower(static::basename($authority)).'_uuid';
         }
 
         return static::isOwnedVia($attribute, $authority, $model);

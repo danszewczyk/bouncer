@@ -120,8 +120,8 @@ class RemovesRoles
     {
         return function ($query) use ($roleId, $authorityId, $morphType) {
             $query->where(Models::scope()->getAttachAttributes() + [
-                'role_id' => $roleId,
-                'entity_id' => $authorityId,
+                'role_uuid' => $roleId,
+                'entity_uuid' => $authorityId,
                 'entity_type' => $morphType,
             ]);
         };

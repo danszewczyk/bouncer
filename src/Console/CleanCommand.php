@@ -88,7 +88,7 @@ class CleanCommand extends Command
         $model = Models::ability();
 
         return $model->whereNotIn($model->getKeyName(), function ($query) {
-            $query->from(Models::table('permissions'))->select('ability_id');
+            $query->from(Models::table('permissions'))->select('ability_uuid');
         });
     }
 
@@ -130,7 +130,7 @@ class CleanCommand extends Command
 
         $query->where("{$table}.entity_type", $modelName);
 
-        $query->whereNotIn("{$table}.entity_id", function ($query) use ($modelName) {
+        $query->whereNotIn("{$table}.entity_uuid", function ($query) use ($modelName) {
             $model = new $modelName;
             $table = $model->getTable();
 
@@ -159,8 +159,8 @@ class CleanCommand extends Command
         $table = $this->abilitiesTable();
 
         return Models::ability()
-                     ->whereNotNull("{$table}.entity_id")
-                     ->where("{$table}.entity_id", '!=', '*')
+                     ->whereNotNull("{$table}.entity_uuid")
+                     ->where("{$table}.entity_uuid", '!=', '*')
                      ->where("{$table}.entity_type", '!=', '*');
     }
 

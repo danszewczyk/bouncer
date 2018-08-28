@@ -3,10 +3,12 @@
 namespace Silber\Bouncer\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\BinaryUuid\HasBinaryUuid;
 
 class Role extends Model
 {
     use Concerns\IsRole;
+    use HasBinaryUuid;
 
     /**
      * The attributes that are mass assignable.
@@ -20,11 +22,7 @@ class Role extends Model
      *
      * @var array
      */
-    protected $casts = [
-        'id' => 'int',
-        'entity_id' => 'int',
-        'level' => 'int',
-    ];
+    protected $casts = ['level' => 'int'];
 
     /**
      * Constructor.
@@ -37,4 +35,5 @@ class Role extends Model
 
         parent::__construct($attributes);
     }
+
 }

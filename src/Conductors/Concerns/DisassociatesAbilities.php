@@ -20,7 +20,7 @@ trait DisassociatesAbilities
      * @param  mixed  $abilities
      * @param  \Illuminate\Database\Eloquent\Model|string|null  $entity
      * @param  array  $attributes
-     * @return bool|\Silber\Bouncer\Conductors\Lazy\ConductsAbilities
+     * @return bool
      */
     public function to($abilities, $entity = null, array $attributes = [])
     {
@@ -68,7 +68,6 @@ trait DisassociatesAbilities
 
         return $relation->newPivotStatement()
                         ->where($foreignKeyName, $model->getKey())
-                        ->where('entity_type', $model->getMorphClass())
                         ->whereIn($relatedKeyName, $ids);
     }
 

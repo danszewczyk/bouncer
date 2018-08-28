@@ -89,7 +89,7 @@ class AbilityTitle extends Title
         return $ability->name === '*'
             && $ability->entity_type !== '*'
             && ! is_null($ability->entity_type)
-            && is_null($ability->entity_id);
+            && is_null($ability->entity_uuid);
     }
 
     /**
@@ -103,7 +103,7 @@ class AbilityTitle extends Title
         return $ability->name !== '*'
             && $ability->entity_type !== '*'
             && ! is_null($ability->entity_type)
-            && is_null($ability->entity_id);
+            && is_null($ability->entity_uuid);
     }
 
     /**
@@ -116,7 +116,7 @@ class AbilityTitle extends Title
     {
         return $ability->entity_type !== '*'
             && ! is_null($ability->entity_type)
-            && ! is_null($ability->entity_id);
+            && ! is_null($ability->entity_uuid);
     }
 
     /**
@@ -129,7 +129,7 @@ class AbilityTitle extends Title
     {
         return $ability->name !== '*'
             && $ability->entity_type === '*'
-            && is_null($ability->entity_id);
+            && is_null($ability->entity_uuid);
     }
 
     /**
@@ -170,7 +170,7 @@ class AbilityTitle extends Title
         $name = $ability->name === '*' ? 'manage' : $ability->name;
 
         return $this->humanize(
-            $name.' '.$this->basename($ability->entity_type).' #'.$ability->entity_id
+            $name.' '.$this->basename($ability->entity_type).' #'.$ability->entity_uuid
         );
     }
 

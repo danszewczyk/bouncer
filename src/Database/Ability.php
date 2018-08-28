@@ -3,10 +3,12 @@
 namespace Silber\Bouncer\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\BinaryUuid\HasBinaryUuid;
 
 class Ability extends Model
 {
     use Concerns\IsAbility;
+    use HasBinaryUuid;
 
     /**
      * The attributes that are mass assignable.
@@ -14,16 +16,6 @@ class Ability extends Model
      * @var array
      */
     protected $fillable = ['name', 'title'];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'id' => 'int',
-        'only_owned' => 'boolean',
-    ];
 
     /**
      * Constructor.

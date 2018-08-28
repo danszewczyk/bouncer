@@ -4,27 +4,15 @@ namespace Silber\Bouncer\Database\Concerns;
 
 use Illuminate\Container\Container;
 
+use Silber\Bouncer\Clipboard;
 use Silber\Bouncer\Database\Role;
 use Silber\Bouncer\Database\Models;
-use Silber\Bouncer\Contracts\Clipboard;
 use Silber\Bouncer\Conductors\AssignsRoles;
 use Silber\Bouncer\Conductors\RemovesRoles;
 use Silber\Bouncer\Database\Queries\Roles as RolesQuery;
 
 trait HasRoles
 {
-    /**
-     * Boot the HasRoles trait.
-     *
-     * @return void
-     */
-    public static function bootHasRoles()
-    {
-        static::deleted(function ($model) {
-            $model->roles()->detach();
-        });
-    }
-
     /**
      * The roles relationship.
      *
@@ -35,20 +23,12 @@ trait HasRoles
         $relation = $this->morphToMany(
             Models::classname(Role::class),
             'entity',
-            Models::table('assigned_roles')
+            Models::table('assigned_roles'),
+            'entity_uuid',
+            'role_uuid'
         );
 
         return Models::scope()->applyToRelation($relation);
-    }
-
-    /**
-     * Get all of the model's assigned roles.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getRoles()
-    {
-        return $this->getClipboardInstance()->getRoles($this);
     }
 
     /**
@@ -196,7 +176,7 @@ trait HasRoles
     /**
      * Get an instance of the bouncer's clipboard.
      *
-     * @return \Silber\Bouncer\Contracts\Clipboard
+     * @return \Silber\Bouncer\Clipboard
      */
     protected function getClipboardInstance()
     {

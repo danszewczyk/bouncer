@@ -15,24 +15,27 @@ class CreateBouncerTables extends Migration
     public function up()
     {
         Schema::create(Models::table('abilities'), function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('uuid');
             $table->string('name', 150);
             $table->string('title')->nullable();
-            $table->integer('entity_id')->unsigned()->nullable();
+            $table->uuid('entity_uuid')->nullable();
             $table->string('entity_type', 150)->nullable();
             $table->boolean('only_owned')->default(false);
-            $table->json('options')->default('{}')->nullable();
-            $table->integer('scope')->nullable()->index();
+            $table->uuid('scope')->nullable()->index();
             $table->timestamps();
+
+            $table->primary('uuid');
         });
 
         Schema::create(Models::table('roles'), function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('uuid');
             $table->string('name', 150);
             $table->string('title')->nullable();
             $table->integer('level')->unsigned()->nullable();
-            $table->integer('scope')->nullable()->index();
+            $table->uuid('scope')->nullable()->index();
             $table->timestamps();
+
+            $table->primary('uuid');
 
             $table->unique(
                 ['name', 'scope'],
@@ -41,37 +44,35 @@ class CreateBouncerTables extends Migration
         });
 
         Schema::create(Models::table('assigned_roles'), function (Blueprint $table) {
-            $table->integer('role_id')->unsigned()->index();
-            $table->integer('entity_id')->unsigned();
+            $table->uuid('role_uuid')->index();
+            $table->uuid('entity_uuid');
             $table->string('entity_type', 150);
-            $table->integer('restricted_to_id')->unsigned()->nullable();
-            $table->string('restricted_to_type', 150)->nullable();
-            $table->integer('scope')->nullable()->index();
+            $table->uuid('scope')->nullable()->index();
 
             $table->index(
-                ['entity_id', 'entity_type', 'scope'],
+                ['entity_uuid', 'entity_type', 'scope'],
                 'assigned_roles_entity_index'
             );
 
-            $table->foreign('role_id')
-                  ->references('id')->on(Models::table('roles'))
+            $table->foreign('role_uuid')
+                  ->references('uuid')->on(Models::table('roles'))
                   ->onUpdate('cascade')->onDelete('cascade');
         });
 
         Schema::create(Models::table('permissions'), function (Blueprint $table) {
-            $table->integer('ability_id')->unsigned()->index();
-            $table->integer('entity_id')->unsigned();
+            $table->uuid('ability_uuid')->index();
+            $table->uuid('entity_uuid');
             $table->string('entity_type', 150);
             $table->boolean('forbidden')->default(false);
-            $table->integer('scope')->nullable()->index();
+            $table->uuid('scope')->nullable()->index();
 
             $table->index(
-                ['entity_id', 'entity_type', 'scope'],
+                ['entity_uuid', 'entity_type', 'scope'],
                 'permissions_entity_index'
             );
 
-            $table->foreign('ability_id')
-                  ->references('id')->on(Models::table('abilities'))
+            $table->foreign('ability_uuid')
+                  ->references('uuid')->on(Models::table('abilities'))
                   ->onUpdate('cascade')->onDelete('cascade');
         });
     }
