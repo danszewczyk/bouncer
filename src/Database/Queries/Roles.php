@@ -76,7 +76,7 @@ class Roles
 
             $query->from($table)
                   ->join($pivot, $key, '=', $pivot.'.entity_uuid')
-                  ->whereRaw("{$prefix}{$pivot}.role_uuid = {$prefix}{$roles}.id")
+                  ->whereRaw("{$prefix}{$pivot}.role_uuid = {$prefix}{$roles}.uuid")
                   ->where("{$pivot}.entity_type", $model->getMorphClass())
                   ->whereIn($key, $keys);
 
